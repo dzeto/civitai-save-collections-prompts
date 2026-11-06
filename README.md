@@ -1,9 +1,6 @@
 # Civitai Save Collections Prompts
 
-A simple JavaScript script that downloads positive generation prompts from Civitai collections.
-
-No installation, Python, or additional tools required.
-Just open your browser console, paste the code, and run it!
+A simple JavaScript script that downloads positive generation prompts from Civitai collections. No installation, Python, or additional tools required. Just open your browser console, paste the code, and run it!
 
 ## Features
 

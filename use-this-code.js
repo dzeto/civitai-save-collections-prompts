@@ -10,7 +10,6 @@
     });
   }
 
-  // Find the page's scrolling container
   const scrollables = [...document.querySelectorAll("*")].filter(el =>
     el.scrollHeight > el.clientHeight + 200 &&
     /(auto|scroll)/.test(getComputedStyle(el).overflowY)
@@ -20,40 +19,38 @@
     (a, b) => b.scrollHeight - a.scrollHeight
   )[0] || document.scrollingElement;
 
-  console.log("Scrolling container:", scroller);
+  const isWindow = scroller === document.scrollingElement;
 
-  // Keep scrolling until no new images appear
+  console.log("Starting faster infinite scroll...");
+
   let unchanged = 0;
   let previousCount = 0;
 
-  console.log("Loading collection images...");
-
-  while (unchanged < 15) {
+  while (unchanged < 12) {
     collectIds();
 
     if (ids.size > previousCount) {
+      console.log(`Found ${ids.size} images`);
       previousCount = ids.size;
       unchanged = 0;
-      console.log("Images found:", ids.size);
     } else {
       unchanged++;
     }
 
-    if (scroller === document.scrollingElement) {
-      window.scrollTo(0, document.body.scrollHeight);
+    if (isWindow) {
+      window.scrollBy(0, Math.floor(window.innerHeight * 0.85));
     } else {
-      scroller.scrollTop = scroller.scrollHeight;
+      scroller.scrollTop += Math.floor(scroller.clientHeight * 0.85);
     }
 
-    await sleep(1800);
+    await sleep(900);
   }
 
   collectIds();
-
   const idList = [...ids];
-  console.log(`Found ${idList.length} images. Starting downloads...`);
 
-  // Download each prompt separately
+  console.log(`Found ${idList.length} images. Downloading prompts...`);
+
   let success = 0;
   let failed = 0;
 
@@ -76,7 +73,6 @@
       );
 
       const prompt = candidates[0]?.innerText?.trim();
-
       if (!prompt) throw new Error("Prompt not found");
 
       const blob = new Blob([prompt], {
@@ -98,11 +94,10 @@
 
     } catch (err) {
       failed++;
-      console.warn(`[${i + 1}/${idList.length}] Failed ${id}:`, err);
+      console.warn(`Failed ${id}:`, err);
     }
 
-    // Give Chrome time to process each download
-    await sleep(800);
+    await sleep(500);
   }
 
   console.log("========== FINISHED ==========");
